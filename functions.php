@@ -44,7 +44,7 @@ add_action( 'wp_enqueue_scripts', 'birdmagazine_4toriko_scripts' );
 
 //////////////////////////////////////////
 //  display maker
-function  birdmagazine_4toriko_the_maker($ID, $before, $after, $link = true ) {
+function birdmagazine_4toriko_the_maker($ID, $before, $after, $link = true ) {
 
 	$my_posts = get_field( 'maker', $ID );
 	if( $my_posts && is_array( $my_posts )):
@@ -186,25 +186,26 @@ add_action( 'widgets_init', create_function( '', 'register_widget( "birdmagazine
 // Display entry meta information
 function birdmagazine_entry_meta() {
 ?>
-	<?php if( is_single() || is_archive() ) : ?>
-		<div class="icon postdate"><span class="screen-reader-text"><?php _e( 'published in', 'birdmagazine' ); ?></span><time datetime="<?php echo get_the_time('Y-m-d') ?>"><?php echo get_post_time(get_option('date_format')); ?></time></div>
-	<?php endif; ?>
+	<?php if( is_archive() ) : // archive ?>
+		<?php birdmagazine_4toriko_the_maker( get_the_ID(), '<div class="maker">', '</div>', false ); ?>
+	<?php elseif( is_home() ): // homme ?>
+		<?php birdmagazine_4toriko_the_maker( get_the_ID(), '<span>', '</span>' ); ?>
+		<?php birdmagazine_4toriko_the_price( get_the_ID(), '<span>', '円</span>' ); ?>
 
-	<?php birdmagazine_4toriko_the_maker( get_the_ID(), '<div>', '</div>' ); ?>
-	<?php birdmagazine_4toriko_the_price( get_the_ID(), '<div>', '円</div>' ); ?>
-
-	<?php if( !is_archive() ) : ?>
-
-		<?php if( is_single() ): ?>
-			<div class="icon category"><span class="screen-reader-text"><?php _e( 'category in', 'birdmagazine' ); ?></span><?php the_category(', ') ?></div>
-			<?php the_tags('<div class="icon tag"><span class="screen-reader-text">' .__( 'tagged', 'birdmagazine' ) .'</span>', ', ', '</div>') ?>
-		<?php endif; ?>
-	<?php endif; ?>
-
-	<?php if( is_home() ): ?>
 		<?php if ( comments_open() || get_comments_number() ): ?>
-			<div class="icon comment"><?php comments_number( '0', '1', '%' ); ?></div>
+			<span class="icon comment"><?php comments_number( '0', '1', '%' ); ?></span>
 		<?php endif; ?>
+
+	<?php elseif( is_single() ): // single ?>
+
+		<dl>
+		<dt>食べた日</dt><dd><time datetime="<?php the_time( 'Y-m-d' ); ?>"><?php echo get_post_time(get_option('date_format')); ?></time></dd>
+		<?php birdmagazine_4toriko_the_maker( get_the_ID(), '<dt>メーカー</dt><dd>', '</dd>' ); ?>
+		<?php birdmagazine_4toriko_the_price( get_the_ID(), '<dt>価格</dt><dd>', ' 円</dd>' ); ?>
+		<dt>種類</dt><dd><?php the_category(', '); ?></dd>
+		<?php the_tags('<dt>キーワード</dt><dd>', ', ', '</dd>'); ?>
+		</dl>
+
 	<?php endif; ?>
 
 <?php

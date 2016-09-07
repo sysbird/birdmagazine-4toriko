@@ -17,3 +17,57 @@ Text Domain: birdmagazine-4toriko
 This theme, like WordPress, is licensed under the GPL.
 */
 
+.archive ul.articles li .maker,
+.search ul.articles li .maker {
+	flex-basis: 0;
+	flex-grow: 1;
+	flex-shrink: 1;
+	text-align: right;
+
+}
+
+.single .entry-meta dl {
+	margin-bottom: 0;
+}
+
+.single .entry-meta dt {
+	width: 7em;
+	float: left; }
+.single .entry-meta dd {
+	margin: 0 0 0 8em;
+	overflow: hidden;
+	*zoom: 1; }
+
+/* bread crumb for wp-manager
+-------------------------------------------------------------- */
+.bread_crumb {
+  list-style-type: none;
+  color: #999;
+  font-size: 0.9rem;
+  margin: 0 0 2% 0;
+  padding: 0; }
+  .bread_crumb li {
+    display: inline-block;
+    line-height: 1; }
+    .bread_crumb li a:after {
+      content: "\f105";
+      display: inline-block;
+      font-family: FontAwesome;
+      font-style: normal;
+      font-weight: normal;
+      line-height: 1;
+      padding-left: 0.4em;
+      padding-right: 0.2em;
+      -webkit-font-smoothing: antialiased;
+      -moz-osx-font-smoothing: grayscale; }
+
+.entry.category-snack {
+  border-top: solid 2px #DDB505; }
+.entry.category-chocolate {
+  border-top: solid 2px #C44816; }
+.entry.category-cookie {
+  border-top: solid 2px #C392B6; }
+.entry.category-candy {
+  border-top: solid 2px #88B9CC; }
+.entry.category-senbei {
+  border-top: solid 2px #C2CB10; }
