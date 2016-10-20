@@ -17,13 +17,12 @@ Text Domain: birdmagazine-4toriko
 This theme, like WordPress, is licensed under the GPL.
 */
 
-.archive ul.articles li .maker,
-.search ul.articles li .maker {
+.archive ul.articles li .meta,
+.search ul.articles li .meta {
 	flex-basis: 0;
 	flex-grow: 1;
 	flex-shrink: 1;
 	text-align: right;
-
 }
 
 .single .entry-meta dl {
@@ -62,12 +61,21 @@ This theme, like WordPress, is licensed under the GPL.
       -moz-osx-font-smoothing: grayscale; }
 
 .entry.category-snack {
-  border-top: solid 2px #DDB505; }
+  border-bottom-color: #DDB505; }
 .entry.category-chocolate {
-  border-top: solid 2px #C44816; }
+  border-bottom-color: #C44816; }
 .entry.category-cookie {
-  border-top: solid 2px #C392B6; }
+  border-bottom-color: #C392B6; }
 .entry.category-candy {
-  border-top: solid 2px #88B9CC; }
+  border-bottom-color: #88B9CC; }
 .entry.category-senbei {
-  border-top: solid 2px #C2CB10; }
+  border-bottom-color: #C2CB10; }
+
+/* Media queries for responsive design
+--------------------------------------------- */
+/* --- PCs --- */
+@media screen and (min-width: 1000px) {
+	.single .entry-eyecatch {
+		width: 40%;
+		float: right;
+		margin: 0 0 0.85em 0.85em; } }

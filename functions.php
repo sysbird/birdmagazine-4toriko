@@ -27,7 +27,7 @@ add_action( 'init', 'birdmagazine_4toriko_init', 0 );
 //////////////////////////////////////////////////////
 // Filter at main query
 function birdmagazine_4toriko_query( $query ) {
-	if ( $query->is_main_query() && ( $query->is_archive() || $query->is_search() ) ) {
+	if ( !is_admin() && $query->is_main_query() && ( $query->is_archive() || $query->is_search() ) ) {
 		$query->set( 'posts_per_page', 3 );
 	}
 }
@@ -94,8 +94,8 @@ function birdmagazine_4toriko_the_info() {
 }
 
 //////////////////////////////////////////////////////
-// Show attachment photos exept eyecatch
-function  birdmagazine_4toriko_the_post_images( $ID ) {
+// attachment photos exept eyecatch
+function  birdmagazine_4toriko_the_photos( $ID ) {
 
 	$html = '';
 	$attachments = get_children( array('post_parent' => $ID, 'post_type' => 'attachment', 'post_mime_type' => 'image' ));
@@ -111,8 +111,9 @@ function  birdmagazine_4toriko_the_post_images( $ID ) {
 
 	if( !empty( $html ) ){
 		$html = '<div class="photos">' .$html .'</div>' ."\r\n";
-		echo $html;
 	}
+
+	echo $html;
 }
 
 //////////////////////////////////////////////////////
@@ -187,26 +188,86 @@ add_action( 'widgets_init', create_function( '', 'register_widget( "birdmagazine
 function birdmagazine_entry_meta() {
 ?>
 	<?php if( is_archive() ) : // archive ?>
-		<?php birdmagazine_4toriko_the_maker( get_the_ID(), '<div class="maker">', '</div>', false ); ?>
-	<?php elseif( is_home() ): // homme ?>
+		<?php birdmagazine_4toriko_the_maker( get_the_ID(), '<div class="meta">', '</div>', false ); ?>
+	<?php elseif( is_home() ): // home ?>
 		<?php birdmagazine_4toriko_the_maker( get_the_ID(), '<span>', '</span>' ); ?>
 		<?php birdmagazine_4toriko_the_price( get_the_ID(), '<span>', '円</span>' ); ?>
 
 		<?php if ( comments_open() || get_comments_number() ): ?>
 			<span class="icon comment"><?php comments_number( '0', '1', '%' ); ?></span>
 		<?php endif; ?>
-
-	<?php elseif( is_single() ): // single ?>
-
+	<?php elseif( is_singular( 'maker' ) ): // single maker ?>
+		<?php birdmagazine_4toriko_the_price( get_the_ID(), '<div class="meta">', ' 円</div>' ); ?>
+	<?php elseif( is_single() ): // single post ?>
 		<dl>
-		<dt>食べた日</dt><dd><time datetime="<?php the_time( 'Y-m-d' ); ?>"><?php echo get_post_time(get_option('date_format')); ?></time></dd>
+		<dt>登録日</dt><dd><time datetime="<?php the_time( 'Y-m-d' ); ?>"><?php echo get_post_time(get_option('date_format')); ?></time></dd>
 		<?php birdmagazine_4toriko_the_maker( get_the_ID(), '<dt>メーカー</dt><dd>', '</dd>' ); ?>
 		<?php birdmagazine_4toriko_the_price( get_the_ID(), '<dt>価格</dt><dd>', ' 円</dd>' ); ?>
 		<dt>種類</dt><dd><?php the_category(', '); ?></dd>
 		<?php the_tags('<dt>キーワード</dt><dd>', ', ', '</dd>'); ?>
 		</dl>
 
+		<?php if( !wp_is_mobile()){
+			birdmagazine_4toriko_the_photos( get_the_ID() );
+		} ?>
+
 	<?php endif; ?>
 
 <?php
 }
+
+//////////////////////////////////////////////////////
+// Yearly Archive
+function birdmagazine_4toriko_yearly ( $atts ) {
+
+	$output = '';
+
+	$home = home_url( '/' );
+	$last_year = date("Y");
+
+	$first_year = $last_year;
+	$args = array(
+		'numberposts'	=> 1,
+		'orderby'	=> 'post_date',
+		'order'		=> 'ASC',
+	);
+	$posts = get_posts( $args );
+	if($posts) {
+
+		$output .= '<div class="archive"><ul class="articles">';
+
+		foreach ( $posts as $post ) {
+			$first_year = mysql2date( 'Y', $post->post_date, true );
+		}
+
+		for($y = $last_year; $y >= $first_year; $y--){
+
+$output .= <<<EOD
+		<li><a href="$home/$y">{$y}年</a></li>
+EOD;
+		}
+		wp_reset_postdata();
+
+		$output .= '</ul></div>';
+	}
+
+	return $output;
+}
+add_shortcode( 'birdmagazine_4toriko_yearly', 'birdmagazine_4toriko_yearly' );
+
+//////////////////////////////////////////////////////
+// the attachment image at single page
+function birdmagazine_4toriko_yearly_content ( $content ) {
+
+	if( is_single() ){
+		$eyecatch = get_the_post_thumbnail( get_the_ID() );
+		if( $eyecatch ){
+			$eyecatch = '<div class="entry-eyecatch">' .$eyecatch .'</div>';
+		}
+
+		$content = $eyecatch .$content;
+	}
+
+	return $content;
+}
+add_filter( 'the_content', 'birdmagazine_4toriko_yearly_content');
