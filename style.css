@@ -60,16 +60,38 @@ This theme, like WordPress, is licensed under the GPL.
       -webkit-font-smoothing: antialiased;
       -moz-osx-font-smoothing: grayscale; }
 
-.entry.category-snack {
-  border-bottom-color: #DDB505; }
-.entry.category-chocolate {
-  border-bottom-color: #C44816; }
+.entry.category-snack,
+.entry.category-snack .entry-header .postdate {
+  border-color: #DDB505; }
+.entry.category-snack .entry-header .postdate a {
+  color: #DDB505; }
+
+.entry.category-chocolate,
+.entry.category-chocolate .entry-header .postdate {
+  border-color: #C44816; }
+.entry.category-chocolate .entry-header .postdate a {
+  color: #C44816; }
+
 .entry.category-cookie {
   border-bottom-color: #C392B6; }
+.entry.category-cookie .entry-header .postdate {
+  border-color: #C392B6; }
+.entry.category-cookie .entry-header .postdate a {
+  color: #C392B6; }
+
 .entry.category-candy {
   border-bottom-color: #88B9CC; }
+.entry.category-candy .entry-header .postdate {
+  border-color: #88B9CC; }
+.entry.category-candy .entry-header .postdate a {
+  color: #88B9CC; }
+
 .entry.category-senbei {
   border-bottom-color: #C2CB10; }
+.entry.category-senbei .entry-header .postdate {
+  border-color: #C2CB10; }
+.entry.category-senbei .entry-header .postdate a {
+  color: #C2CB10; }
 
 /* Media queries for responsive design
 --------------------------------------------- */

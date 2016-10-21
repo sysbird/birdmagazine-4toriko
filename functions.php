@@ -16,7 +16,7 @@ function birdmagazine_4toriko_init() {
 		'public'		=> true,	// 公開するかどうが
 		'show_ui'		=> true,	// メニューに表示するかどうか
 		'menu_position'	=> 5,		// メニューの表示位置
-		'has_ar	chive'	=> true,	// アーカイブページの作成
+		'has_archive'	=> true,	// アーカイブページの作成
 		);
 
 	register_post_type( 'maker', $args );
@@ -271,3 +271,12 @@ function birdmagazine_4toriko_yearly_content ( $content ) {
 	return $content;
 }
 add_filter( 'the_content', 'birdmagazine_4toriko_yearly_content');
+
+//////////////////////////////////////////////////////
+// google analytics
+function birdmagazine_4toriko_google_analytics(){
+	if( !is_user_logged_in() ){
+		include('google_analytics.php');
+	}
+}
+add_action('wp_head', 'birdmagazine_4toriko_google_analytics');
