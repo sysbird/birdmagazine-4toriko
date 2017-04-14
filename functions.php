@@ -38,9 +38,9 @@ add_action( 'pre_get_posts', 'birdmagazine_4toriko_query' );
 function birdmagazine_4toriko_scripts() {
 
 	wp_enqueue_style( 'parent-style', get_template_directory_uri().'/style.css' );
+
 }
 add_action( 'wp_enqueue_scripts', 'birdmagazine_4toriko_scripts' );
-
 
 //////////////////////////////////////////
 //  display maker
@@ -135,10 +135,6 @@ class birdmagazine_4toriko_yaerly_widgets extends WP_Widget {
 
 		$output = '';
 
-		if( !empty( $html ) ){
-			$html = '<ul class="yearly">' .$html .'</ul>';
-		}
-
 		$home = home_url( '/' );
 		$year = date( "Y" );
 
@@ -184,10 +180,103 @@ EOD;
 add_action( 'widgets_init', create_function( '', 'register_widget( "birdmagazine_4toriko_yaerly_widgets" );' ) );
 
 //////////////////////////////////////////////////////
+// Widget Related
+class birdmagazine_4toriko_related_widgets extends WP_Widget {
+
+	function __construct() {
+		parent::__construct( false, $name = '関連記事' );
+	}
+
+	function widget( $args, $instance ) {
+
+		if( !is_single() ){
+			return;
+		}
+
+		extract( $args );
+		$title = apply_filters( 'widget_title', $instance['title'] );
+
+		// relataed tag
+		$tags = '';
+		$posttags = get_the_tags();
+		if( !$posttags ){
+			return;
+		}
+
+		foreach($posttags as $tag) {
+			if(!empty($tags)){
+				$tags .= ',';
+			}
+			$tags .= $tag->name;
+			break;
+		}
+		$output = '';
+
+		// loop
+		$param = array( 'showposts' => 10, 'post_type' => 'post', 'exclude' =>get_the_ID() ,'tag' => $tags, 'orderby' => 'rand' );
+		$myposts = get_posts($param);
+		foreach($myposts as $post){
+
+			setup_postdata($post);  // post
+
+			$ti = get_the_title($post->ID);
+			$ur = get_permalink($post->ID);
+			$th =  get_the_post_thumbnail($post->ID, 'thumbnail');
+			$thumbnail_id = get_post_meta( $post->ID, "_thumbnail_id", true );
+
+			$attachments = get_children( array( 'showposts' => 1, 'post_parent' => $post->ID, 'exclude' =>$thumbnail_id, 'exclude' =>$thumbnail_id, 'post_type' => 'attachment', 'post_mime_type' => 'image' ));
+			if( is_array( $attachments ) ){
+				foreach( $attachments as $attachment ){
+					$thumbnail = wp_get_attachment_url( intval( $attachment->ID ));
+					$th = '<img src="' .$thumbnail .'" alt="写真">';
+					break;
+				}
+			}
+
+			$output .= '<li><a href="' .$ur .'">' .$th .'<strong>' .$ti .'</strong></a></li>';
+		}
+
+		if(!empty($output)){
+			$output = '<ul class="related">' .$output .'</ul>';
+		}
+
+		?>
+		<div class="widget">
+			<?php if ( $title ) ?>
+			<?php echo $before_title . $title . $after_title; ?>
+			<?php echo $output; ?>
+		</div>
+		<?php
+
+	}
+
+	function update($new_instance, $old_instance ) {
+		$instance = $old_instance;
+		$instance['title'] = strip_tags( $new_instance['title'] );
+		$instance['body'] = trim( $new_instance['body'] );
+		return $instance;
+	}
+
+	function form($instance) {
+		$title = esc_attr( $instance['title'] );
+		$body = esc_attr( $instance['body'] );
+		?>
+		<p>
+			<label for="<?php echo $this->get_field_id( 'title' ); ?>">
+			<?php _e( 'タイトル:' ); ?>
+			</label>
+			<input class="widefat" id="<?php echo $this->get_field_id( 'title' ); ?>" name="<?php echo $this->get_field_name( 'title' ); ?>" type="text" value="<?php echo $title; ?>" />
+		</p>
+		<?php
+	}
+}
+add_action( 'widgets_init', create_function( '', 'register_widget( "birdmagazine_4toriko_related_widgets" );' ) );
+
+//////////////////////////////////////////////////////
 // Display entry meta information
 function birdmagazine_entry_meta() {
 ?>
-	<?php if( is_archive() ) : // archive ?>
+	<?php if( is_archive() || is_search() ) : // archive ?>
 		<?php birdmagazine_4toriko_the_maker( get_the_ID(), '<div class="meta">', '</div>', false ); ?>
 	<?php elseif( is_home() ): // home ?>
 		<?php birdmagazine_4toriko_the_maker( get_the_ID(), '<span>', '</span>' ); ?>
@@ -257,7 +346,7 @@ add_shortcode( 'birdmagazine_4toriko_yearly', 'birdmagazine_4toriko_yearly' );
 
 //////////////////////////////////////////////////////
 // the attachment image at single page
-function birdmagazine_4toriko_yearly_content ( $content ) {
+function birdmagazine_4toriko_the_eyecatch ( $content ) {
 
 	if( is_single() ){
 		$eyecatch = get_the_post_thumbnail( get_the_ID() );
@@ -270,11 +359,62 @@ function birdmagazine_4toriko_yearly_content ( $content ) {
 
 	return $content;
 }
-add_filter( 'the_content', 'birdmagazine_4toriko_yearly_content');
+add_filter( 'the_content', 'birdmagazine_4toriko_the_eyecatch');
+
+//////////////////////////////////////////////////////
+// Archive Title
+function birdmagazine_4toriko_get_the_archive_title( $title ) {
+
+	$pos =  strpos( $title, ': ' );
+	if( false !== $pos ){
+		$title = substr( $title, ($pos +1) );
+	}
+
+	if ( is_year() || is_month() || is_date() ) {
+		$title .= 'に書いた記事';
+	}
+	elseif ( is_author()  ) {
+		$title .= 'が書いた記事';
+	}
+	else {
+		$title = '「' .$title .'」に関する記事';
+	}
+
+	$title .= birdmagazine_4toriko_get_count();
+
+	return $title;
+}
+add_filter( 'get_the_archive_title', 'birdmagazine_4toriko_get_the_archive_title');
+
+//////////////////////////////////////////////////////
+// Pagenation
+function birdmagazine_4toriko_get_count() {
+
+	global $wp_query;
+
+	$paged = get_query_var( 'paged' ) - 1;
+	$posts_per_page   = get_query_var( 'posts_per_page' );
+	$count = $total = $wp_query->post_count;
+	$start  = 0;
+	if ( 0 < $posts_per_page ) {
+		$total = $wp_query->found_posts;
+		if ( 0 < $paged ){
+			$start  = $paged * $posts_per_page;
+		}
+	}
+
+	$html = sprintf( '<span> - %1$s%2$s件目を表示 (全%3$s件) - </span>',
+		( 1 < $count ? ($start + 1 . '〜') : '' ),
+		($start + $count ),
+		$total );
+
+	return $html;
+}
 
 //////////////////////////////////////////////////////
 // google analytics
 function birdmagazine_4toriko_google_analytics(){
+
 	if( !is_user_logged_in() ){
 		include('google_analytics.php');
 	}

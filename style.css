@@ -93,6 +93,46 @@ This theme, like WordPress, is licensed under the GPL.
 .entry.category-senbei .entry-header .postdate a {
   color: #C2CB10; }
 
+.single .photos img {
+	display: block;
+	margin: 0.85em auto 0; }
+
+.archive .page-title span {
+	display: block;
+	margin-top: 0.85em;
+	color: #999;
+	font-size: 0.5em;
+}
+
+.archive .taxonomy-description {
+	margin-top: 0.85em;
+	color: #999;
+	font-size: 0.9em;
+}
+
+.widget ul.related li {
+	padding-left: 0;
+}
+
+.widget ul.related li::before {
+	display: none;
+}
+
+.widget ul.related li a {
+	display: -webkit-flex;
+	display: flex;
+}
+
+.widget ul.related li img {
+	max-width: 100%;
+	height: auto;
+	flex: 1;
+}
+
+.widget ul.related li strong {
+	flex: 2;
+	padding-left: 5%;
+}
 /* Media queries for responsive design
 --------------------------------------------- */
 /* --- PCs --- */
