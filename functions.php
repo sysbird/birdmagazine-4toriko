@@ -28,7 +28,7 @@ add_action( 'init', 'birdmagazine_4toriko_init', 0 );
 // Filter at main query
 function birdmagazine_4toriko_query( $query ) {
 	if ( !is_admin() && $query->is_main_query() && ( $query->is_archive() || $query->is_search() ) ) {
-		$query->set( 'posts_per_page', 3 );
+//		$query->set( 'posts_per_page', 3 );
 	}
 }
 add_action( 'pre_get_posts', 'birdmagazine_4toriko_query' );
@@ -282,9 +282,12 @@ function birdmagazine_entry_meta() {
 		<?php birdmagazine_4toriko_the_maker( get_the_ID(), '<span>', '</span>' ); ?>
 		<?php birdmagazine_4toriko_the_price( get_the_ID(), '<span>', '円</span>' ); ?>
 
-		<?php if ( comments_open() || get_comments_number() ): ?>
-			<span class="icon comment"><?php comments_number( '0', '1', '%' ); ?></span>
+		<?php if ( ! post_password_required() && ( comments_open() || get_comments_number() ) ) : ?>
+			<div class="icon comment"><?php comments_popup_link( '0', '1', '%' ); ?></div>
 		<?php endif; ?>
+
+		<?php birdmagazine_4toriko_the_type(); ?>
+
 	<?php elseif( is_singular( 'maker' ) ): // single maker ?>
 		<?php birdmagazine_4toriko_the_price( get_the_ID(), '<div class="meta">', ' 円</div>' ); ?>
 	<?php elseif( is_single() ): // single post ?>
@@ -294,6 +297,9 @@ function birdmagazine_entry_meta() {
 		<?php birdmagazine_4toriko_the_price( get_the_ID(), '<dt>価格</dt><dd>', ' 円</dd>' ); ?>
 		<dt>種類</dt><dd><?php the_category(', '); ?></dd>
 		<?php the_tags('<dt>キーワード</dt><dd>', ', ', '</dd>'); ?>
+		<?php if(function_exists('the_ratings')) : ?>
+		<dt>食べたい度</dt><dd><?php the_ratings(); ?>
+		<?php endif; ?></dd>
 		</dl>
 
 		<?php if( !wp_is_mobile()){
@@ -403,12 +409,29 @@ function birdmagazine_4toriko_get_count() {
 		}
 	}
 
-	$html = sprintf( '<span> - %1$s%2$s件目を表示 (全%3$s件) - </span>',
+	$html = sprintf( '<span>%1$s%2$s件目を表示 (全%3$s件)</span>',
 		( 1 < $count ? ($start + 1 . '〜') : '' ),
 		($start + $count ),
 		$total );
 
 	return $html;
+}
+
+//////////////////////////////////////////////////////
+// google analytics
+function birdmagazine_4toriko_the_type(){
+
+	$cat_type = get_category_by_slug( "type" );
+
+	$categories = get_the_category();
+	if ( $categories ) {
+		foreach( $categories as $cat ) {
+//var_dump($cat);
+			if( $cat_type->cat_ID == $cat->cat_ID ){
+				echo '<div class="type">' .$cat->cat_name .'</div>';
+			}
+		}
+	}
 }
 
 //////////////////////////////////////////////////////
